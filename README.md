@@ -1,6 +1,7 @@
 ## KotlinLibTest
 
 [![](https://jitpack.io/v/Sztorm/KotlinLibTest.svg)](https://jitpack.io/#Sztorm/KotlinLibTest)
+![](misc/testCoverage.svg)
 
 In this repository I'm checking how things are working.
 
