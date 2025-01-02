@@ -1,6 +1,12 @@
+@file:Suppress("SpellCheckingInspection")
+
+// Common tasks
+// Generate badges: ./gradlew :generateBadges
+
 plugins {
     kotlin("multiplatform") version "2.0.0"
     id("maven-publish")
+    id("org.jetbrains.kotlinx.kover") version "0.9.0"
 }
 
 group = "com.sztorm"
@@ -56,4 +62,10 @@ kotlin {
         val nativeMain by getting
         val nativeTest by getting
     }
+}
+
+tasks.register<GenerateBadges>("generateBadges") {
+    testCoverageInputFile.set(project.layout.buildDirectory.file("reports/kover/report.xml"))
+    testCoverageBadgeOutputFile.set(project.layout.projectDirectory.file("misc/testCoverage.svg"))
+    dependsOn("koverXmlReport")
 }
