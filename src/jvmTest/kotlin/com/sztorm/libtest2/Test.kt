@@ -16,4 +16,9 @@ class Test {
         //println(example4)
         assert(true)
     }
+
+    @Test
+    fun test2() {
+        assert(false)
+    }
 }

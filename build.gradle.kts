@@ -65,7 +65,9 @@ kotlin {
 }
 
 tasks.register<GenerateBadges>("generateBadges") {
-    testCoverageInputFile.set(project.layout.buildDirectory.file("reports/kover/report.xml"))
-    testCoverageBadgeOutputFile.set(project.layout.projectDirectory.file("misc/testCoverage.svg"))
-    dependsOn("koverXmlReport")
+    testCoverageInput.set(project.layout.buildDirectory.file("reports/kover/report.xml"))
+    testsStatusInput.set(project.layout.buildDirectory.file("reports/tests/jvmTest/index.html"))
+    testCoverageOutput.set(project.layout.projectDirectory.file("misc/testCoverage.svg"))
+    testsStatusOutput.set(project.layout.projectDirectory.file("misc/testsStatus.svg"))
+    finalizedBy("koverXmlReport")
 }
