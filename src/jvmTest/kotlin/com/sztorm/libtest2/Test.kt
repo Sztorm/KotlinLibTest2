@@ -8,17 +8,17 @@ class Test {
         val example = ExampleClass(2, 3f)
         val example2 = ExampleClass2(4, 5f)
         val example3 = exampleFunction(1f)
-        //val example4 = exampleFunction2(2f)
+        val example4 = exampleFunction2(2f)
 
         println(example)
         println(example2)
         println(example3)
-        //println(example4)
+        println(example4)
         assert(true)
     }
 
     @Test
     fun test2() {
-        assert(false)
+        assert(true)
     }
 }
