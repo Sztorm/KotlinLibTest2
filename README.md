@@ -1,7 +1,8 @@
 ## KotlinLibTest
 
 [![](https://jitpack.io/v/Sztorm/KotlinLibTest.svg)](https://jitpack.io/#Sztorm/KotlinLibTest)
-![](misc/testCoverage.svg)
+![tests status badge](misc/testsStatus.svg)
+![test coverage badge](misc/testCoverage.svg)
 
 In this repository I'm checking how things are working.
 
