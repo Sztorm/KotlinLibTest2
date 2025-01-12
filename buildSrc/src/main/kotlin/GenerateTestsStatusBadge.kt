@@ -29,35 +29,43 @@ abstract class GenerateTestsStatusBadge : DefaultTask() {
     @Suppress("SpellCheckingInspection")
     private fun getTestsStatusBadge(statusResult: StatusResult): String {
         val badgeColor = when (statusResult) {
-            StatusResult.Passing -> passingColor.formatRgb()
-            StatusResult.Failing -> failingColor.formatRgb()
-            StatusResult.Unknown -> unknownColor.formatRgb()
-        }
+            StatusResult.Passing -> passingColor
+            StatusResult.Failing -> failingColor
+            StatusResult.Unknown -> unknownColor
+        }.formatRgb()
         val formattedStatus = when (statusResult) {
             StatusResult.Passing -> "Passing"
             StatusResult.Failing -> "Failing"
             StatusResult.Unknown -> "Unknown"
         }
+        val testsWidth = 38
+        val (statusWidth, statusX) = when (statusResult) {
+            StatusResult.Passing -> Pair(52, 64)
+            StatusResult.Failing -> Pair(44, 60)
+            StatusResult.Unknown -> Pair(60, 68)
+        }
+        val totalWidth = testsWidth + statusWidth
+
         val result =
             """
-            <svg xmlns="http://www.w3.org/2000/svg" width="90" height="20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="$totalWidth" height="20">
                 <linearGradient id="smooth" x2="0" y2="100%">
                     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
                     <stop offset="1" stop-opacity=".1"/>
                 </linearGradient>
                 <mask id="round">
-                    <rect width="90" height="20" rx="3" fill="#fff"/>
+                    <rect width="$totalWidth" height="20" rx="3" fill="#fff"/>
                 </mask>
                 <g mask="url(#round)">
-                    <rect width="38" height="20" fill="#555"/>
-                    <rect width="52" height="20" x="38" fill="$badgeColor"/>
-                    <rect width="90" height="20" fill="url(#smooth)"/>
+                    <rect width="$testsWidth" height="20" fill="#555"/>
+                    <rect width="$statusWidth" height="20" x="$testsWidth" fill="$badgeColor"/>
+                    <rect width="$totalWidth" height="20" fill="url(#smooth)"/>
                 </g>
                 <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
                     <text x="19" y="15" fill="#010101" fill-opacity=".3">Tests</text>
                     <text x="19" y="14">Tests</text>
-                    <text x="64" y="15" fill="#010101" fill-opacity=".3">$formattedStatus</text>
-                    <text x="64" y="14">$formattedStatus</text>
+                    <text x="$statusX" y="15" fill="#010101" fill-opacity=".3">$formattedStatus</text>
+                    <text x="$statusX" y="14">$formattedStatus</text>
                 </g>
             </svg>
             """.trimIndent()
@@ -69,8 +77,10 @@ abstract class GenerateTestsStatusBadge : DefaultTask() {
     fun generate() {
         val testsStatusBadge = testsStatusReportInput.get().asFile
             .readText()
-            .let(::getTestsStatusResult)
+            //.let { StatusResult.Passing }
+            //.let { StatusResult.Failing }
             //.let { StatusResult.Unknown }
+            .let(::getTestsStatusResult)
             .let(::getTestsStatusBadge)
 
         badgeOutput.get().asFile.writeText(testsStatusBadge)
