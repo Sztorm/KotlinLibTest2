@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -12,38 +14,41 @@ abstract class GenerateCoverageBadge : DefaultTask() {
     @get:OutputFile
     abstract val badgeOutput: RegularFileProperty
 
-    private fun getCoverageResult(reportFile: List<String>): CoverageResult? =
+    private fun getCoverageResult(reportFile: List<String>): CoverageResult =
         if (reportFile.size >= 3) {
             val methodCoverageLine = reportFile[reportFile.size - 3]
             val regex = Regex("""<counter type="METHOD" missed="(\d+)" covered="(\d+)"/>""")
             val match = regex.find(methodCoverageLine)
 
             when {
-                match == null -> null
+                match == null -> CoverageResult.Unknown
                 else -> {
                     val missed = match.groupValues[1].toInt()
                     val covered = match.groupValues[2].toInt()
-                    val total = missed + covered
-                    val coverageRatio = (covered.toDouble() / total.toDouble())
-                    val coverageRatioPercentage = coverageRatio * 100.0
-                    val symbols = DecimalFormatSymbols(Locale.US)
-                    val df = DecimalFormat("#.#", symbols)
-                    val formattedRatio = "${df.format(coverageRatioPercentage)}%"
 
-                    CoverageResult(coverageRatio, formattedRatio)
+                    CoverageResult.Successful(missed, covered)
                 }
             }
-        } else null
+        } else CoverageResult.Unknown
+
+    fun formatPercentage(value: Double): String {
+        val percentage = value * 100.0
+        val symbols = DecimalFormatSymbols(Locale.US)
+        val df = DecimalFormat("#.#", symbols)
+
+        return "${df.format(percentage)}%"
+    }
 
     @Suppress("SpellCheckingInspection")
-    private fun getCoverageBadge(coverageResult: CoverageResult?): String {
-        val formattedCoverage = coverageResult?.formattedRatio ?: "Unknown"
-        val badgeColor = coverageResult?.ratio.let {
-            when (it) {
-                null -> unknownColor
-                else -> lerp(coverageGradient, it)
-            }.formatRgb()
+    private fun getCoverageBadge(coverageResult: CoverageResult): String {
+        val formattedCoverage = when (coverageResult) {
+            is CoverageResult.Successful -> formatPercentage(coverageResult.ratio)
+            CoverageResult.Unknown -> "Unknown"
         }
+        val badgeColor = when (coverageResult) {
+            is CoverageResult.Successful -> lerp(coverageGradient, coverageResult.ratio)
+            CoverageResult.Unknown -> unknownColor
+        }.formatRgb()
         val result =
             """
             <svg xmlns="http://www.w3.org/2000/svg" width="104" height="20">
@@ -76,12 +81,23 @@ abstract class GenerateCoverageBadge : DefaultTask() {
         val coverageBadge = coverageReportInput.get().asFile
             .readLines()
             .let(::getCoverageResult)
+            //.let { CoverageResult.Unknown }
+            //.let { CoverageResult.Successful(2, 8) }
             .let(::getCoverageBadge)
 
         badgeOutput.get().asFile.writeText(coverageBadge)
     }
 
-    data class CoverageResult(val ratio: Double, val formattedRatio: String)
+    sealed class CoverageResult {
+        data class Successful(val missed: Int, val covered: Int) : CoverageResult()
+        object Unknown : CoverageResult()
+    }
+
+    val CoverageResult.Successful.total
+        get() = missed + covered
+
+    val CoverageResult.Successful.ratio
+        get() = covered.toDouble() / total.toDouble()
 
     companion object {
         private val coverageGradient = listOf(

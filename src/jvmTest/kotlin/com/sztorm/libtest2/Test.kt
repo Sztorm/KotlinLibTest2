@@ -15,7 +15,7 @@ class Test {
             ::fun7,
             ::fun8,
             ::fun9,
-            //::fun10,
+            ::fun10,
         )
         val example = ExampleClass(2, 3f)
         val example2 = ExampleClass2(4, 5f)
