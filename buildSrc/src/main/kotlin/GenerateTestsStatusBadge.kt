@@ -45,7 +45,6 @@ abstract class GenerateTestsStatusBadge : DefaultTask() {
             StatusResult.Unknown -> Pair(60, 68)
         }
         val totalWidth = testsWidth + statusWidth
-
         val result =
             """
             <svg xmlns="http://www.w3.org/2000/svg" width="$totalWidth" height="20">
