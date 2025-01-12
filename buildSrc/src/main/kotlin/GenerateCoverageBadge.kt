@@ -12,48 +12,58 @@ abstract class GenerateCoverageBadge : DefaultTask() {
     @get:OutputFile
     abstract val badgeOutput: RegularFileProperty
 
-    private fun getCoverageResult(reportFile: List<String>): String =
+    private fun getCoverageResult(reportFile: List<String>): CoverageResult? =
         if (reportFile.size >= 3) {
             val methodCoverageLine = reportFile[reportFile.size - 3]
             val regex = Regex("""<counter type="METHOD" missed="(\d+)" covered="(\d+)"/>""")
             val match = regex.find(methodCoverageLine)
 
             when {
-                match == null -> "Unknown"
+                match == null -> null
                 else -> {
                     val missed = match.groupValues[1].toInt()
                     val covered = match.groupValues[2].toInt()
                     val total = missed + covered
-                    val result = (covered.toDouble() / total.toDouble()) * 100.0
+                    val coverageRatio = (covered.toDouble() / total.toDouble())
+                    val coverageRatioPercentage = coverageRatio * 100.0
                     val symbols = DecimalFormatSymbols(Locale.US)
                     val df = DecimalFormat("#.#", symbols)
-                    "${df.format(result)}%"
+                    val formattedRatio = "${df.format(coverageRatioPercentage)}%"
+
+                    CoverageResult(coverageRatio, formattedRatio)
                 }
             }
-        } else "Unknown"
+        } else null
 
     @Suppress("SpellCheckingInspection")
-    private fun getCoverageBadge(coverageResult: String): String {
+    private fun getCoverageBadge(coverageResult: CoverageResult?): String {
+        val formattedCoverage = coverageResult?.formattedRatio ?: "Unknown"
+        val badgeColor = coverageResult?.ratio.let {
+            when (it) {
+                null -> unknownColor
+                else -> lerp(coverageGradient, it)
+            }.formatRgb()
+        }
         val result =
             """
-            <svg xmlns="http://www.w3.org/2000/svg" width="130" height="20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="104" height="20">
                 <linearGradient id="smooth" x2="0" y2="100%">
                     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
                     <stop offset="1" stop-opacity=".1"/>
                 </linearGradient>
                 <mask id="round">
-                    <rect width="130" height="20" rx="3" fill="#fff"/>
+                    <rect width="104" height="20" rx="3" fill="#fff"/>
                 </mask>
                 <g mask="url(#round)">
-                    <rect width="90" height="20" fill="#555"/>
-                    <rect width="40" height="20" x="90" fill="rgb(68, 204, 17)"/>
-                    <rect width="130" height="20" fill="url(#smooth)"/>
+                    <rect width="64" height="20" fill="#555"/>
+                    <rect width="40" height="20" x="64" fill="$badgeColor"/>
+                    <rect width="104" height="20" fill="url(#smooth)"/>
                 </g>
                 <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
-                    <text x="45" y="15" fill="#010101" fill-opacity=".3">Test Coverage</text>
-                    <text x="45" y="14">Test Coverage</text>
-                    <text x="110" y="15" fill="#010101" fill-opacity=".3">$coverageResult</text>
-                    <text x="110" y="14">$coverageResult</text>
+                    <text x="32" y="15" fill="#010101" fill-opacity=".3">Coverage</text>
+                    <text x="32" y="14">Coverage</text>
+                    <text x="84" y="15" fill="#010101" fill-opacity=".3">$formattedCoverage</text>
+                    <text x="84" y="14">$formattedCoverage</text>
                 </g>
             </svg>
             """.trimIndent()
@@ -69,5 +79,17 @@ abstract class GenerateCoverageBadge : DefaultTask() {
             .let(::getCoverageBadge)
 
         badgeOutput.get().asFile.writeText(coverageBadge)
+    }
+
+    data class CoverageResult(val ratio: Double, val formattedRatio: String)
+
+    companion object {
+        private val coverageGradient = listOf(
+            InterpolatedColor(Color(199u, 79u, 60u, 255u), t = 0.0),
+            InterpolatedColor(Color(199u, 79u, 60u, 255u), t = 0.5),
+            InterpolatedColor(Color(234u, 194u, 53u, 255u), t = 0.75),
+            InterpolatedColor(Color(68u, 204u, 17u, 255u), t = 1.0),
+        )
+        private val unknownColor = Color(155u, 155u, 155u, 255u)
     }
 }

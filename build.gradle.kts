@@ -73,7 +73,7 @@ tasks.register<GenerateTestsStatusBadge>("generateTestStatusBadge") {
 tasks.register<GenerateCoverageBadge>("generateCoverageBadge") {
     coverageReportInput.set(project.layout.buildDirectory.file("reports/kover/report.xml"))
     badgeOutput.set(project.layout.projectDirectory.file("misc/testCoverage.svg"))
-    dependsOn("koverXmlReport")
+    finalizedBy("koverXmlReport")
 }
 
 tasks.register("generateBadges") {
