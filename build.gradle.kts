@@ -1,7 +1,7 @@
 @file:Suppress("SpellCheckingInspection")
 
 // Common tasks
-// Generate badges: ./gradlew :generateBadges
+// Generate badges: ./gradlew --continue generateBadges
 
 plugins {
     kotlin("multiplatform") version "2.0.0"
@@ -64,19 +64,22 @@ kotlin {
     }
 }
 
+//./gradlew --continue jvmTest generateTestStatusBadge
 tasks.register<GenerateTestsStatusBadge>("generateTestStatusBadge") {
     testsStatusReportInput.set(project.layout.buildDirectory.file("reports/tests/jvmTest/index.html"))
     badgeOutput.set(project.layout.projectDirectory.file("misc/testsStatus.svg"))
-    dependsOn("jvmTest")
+    mustRunAfter("jvmTest")
 }
 
+//./gradlew --continue koverXmlReport generateCoverageBadge
 tasks.register<GenerateCoverageBadge>("generateCoverageBadge") {
     coverageReportInput.set(project.layout.buildDirectory.file("reports/kover/report.xml"))
     badgeOutput.set(project.layout.projectDirectory.file("misc/testCoverage.svg"))
-    finalizedBy("koverXmlReport")
+    mustRunAfter("koverXmlReport")
 }
 
+//./gradlew --continue generateBadges
 tasks.register("generateBadges") {
-    dependsOn("generateTestStatusBadge")
-    dependsOn("generateCoverageBadge")
+    dependsOn("jvmTest", "generateTestStatusBadge", "koverXmlReport", "generateCoverageBadge")
+    tasks.findByPath("koverXmlReport")!!.mustRunAfter("generateTestStatusBadge")
 }
