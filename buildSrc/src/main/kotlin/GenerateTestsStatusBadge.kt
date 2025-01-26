@@ -13,9 +13,9 @@ abstract class GenerateTestsStatusBadge : DefaultTask() {
     fun generate() {
         val testsStatusBadge = testsStatusReportInput.get().asFile
             .readText()
-            //.let { StatusResult.Passing }
-            //.let { StatusResult.Failing }
-            //.let { StatusResult.Unknown }
+            //.let { TestsStatusResult.Passing }
+            //.let { TestsStatusResult.Failing }
+            //.let { TestsStatusResult.Unknown }
             .let(::getTestsStatusResult)
             .let(::getTestsStatusBadge)
 
@@ -27,7 +27,7 @@ abstract class GenerateTestsStatusBadge : DefaultTask() {
         private val failingColor = Color(199u, 79u, 60u, 255u)
         private val unknownColor = Color(155u, 155u, 155u, 255u)
 
-        private fun getTestsStatusResult(reportFile: String): TestsStatusResult {
+        fun getTestsStatusResult(reportFile: String): TestsStatusResult {
             val regex =
                 Regex("""<div class="infoBox" id="failures">\s+<div class="counter">(\d+)</div>""")
             val match = regex.find(reportFile)
@@ -45,7 +45,7 @@ abstract class GenerateTestsStatusBadge : DefaultTask() {
         }
 
         @Suppress("SpellCheckingInspection")
-        private fun getTestsStatusBadge(statusResult: TestsStatusResult): String {
+        fun getTestsStatusBadge(statusResult: TestsStatusResult): String {
             val badgeColor = when (statusResult) {
                 TestsStatusResult.Passing -> passingColor
                 TestsStatusResult.Failing -> failingColor

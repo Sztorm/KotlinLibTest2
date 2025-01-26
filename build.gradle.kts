@@ -73,6 +73,7 @@ tasks.register<GenerateTestsStatusBadge>("generateTestStatusBadge") {
 
 //./gradlew --continue koverXmlReport generateCoverageBadge
 tasks.register<GenerateCoverageBadge>("generateCoverageBadge") {
+    testsStatusReportInput.set(project.layout.buildDirectory.file("reports/tests/jvmTest/index.html"))
     coverageReportInput.set(project.layout.buildDirectory.file("reports/kover/report.xml"))
     badgeOutput.set(project.layout.projectDirectory.file("misc/testCoverage.svg"))
     mustRunAfter("koverXmlReport")
