@@ -1,9 +1,24 @@
 package com.sztorm.libtest2
 
+/**
+ *  Fun 1.
+ *
+ *  @param x X.
+ */
 fun fun1(x: Double) = x + x
 
+/**
+ *  Fun 2.
+ *
+ *  @param x X.
+ */
 fun fun2(x: Double) = x * x
 
+/**
+ *  Fun 3.
+ *
+ *  @param x X.
+ */
 fun fun3(x: Double) = x * x + 5.0
 
 fun fun4(x: Double) = x * x - 2.0
