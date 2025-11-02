@@ -16,30 +16,14 @@ repositories {
     mavenCentral()
 }
 
-val sourcesJar by tasks.named("sourcesJar")
-
-//publishing {
-//    publications {
-//        create<MavenPublication>("kotlin") {
-//            artifactId = project.name
-//            version = project.version as String
-//            groupId = project.group as String
-//            artifact(file("./build/libs/${project.name}-${project.version}.jar"))
-//            artifact(sourcesJar)
-//
-//            afterEvaluate {
-//                from(components["kotlin"])
-//            }
-//        }
-//    }
-//}
-
 kotlin {
     jvmToolchain(17)
     withSourcesJar(publish = true)
 
     jvm {
         withJava()
+        withSourcesJar(publish = true)
+
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
