@@ -18,15 +18,10 @@ repositories {
 
 val sourcesJar by tasks.named("sourcesJar")
 
-publishing {
+configure<PublishingExtension> {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = project.name
-            version = project.version as String
-            groupId = project.group as String
-            artifact(file("./build/libs/${project.name}-${project.version}.jar"))
             artifact(sourcesJar)
-
             from(components["kotlin"])
         }
     }
