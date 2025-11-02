@@ -18,17 +18,25 @@ repositories {
 
 val sourcesJar by tasks.named("sourcesJar")
 
-configure<PublishingExtension> {
-    publications {
-        create<MavenPublication>("maven") {
-            artifact(sourcesJar)
-            from(components["kotlin"])
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("kotlin") {
+//            artifactId = project.name
+//            version = project.version as String
+//            groupId = project.group as String
+//            artifact(file("./build/libs/${project.name}-${project.version}.jar"))
+//            artifact(sourcesJar)
+//
+//            afterEvaluate {
+//                from(components["kotlin"])
+//            }
+//        }
+//    }
+//}
 
 kotlin {
     jvmToolchain(17)
+    withSourcesJar(publish = true)
 
     jvm {
         withJava()
