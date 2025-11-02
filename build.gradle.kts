@@ -20,11 +20,11 @@ val sourcesJar by tasks.named("sourcesJar")
 
 publishing {
     publications {
-        create("main", MavenPublication::class.java) {
+        create<MavenPublication>("mavenKotlin") {
+            from(components["kotlin"])
             artifactId = project.name
             version = project.version as String
             groupId = project.group as String
-            from(components["kotlin"])
             artifact(file("./build/libs/${project.name}-${project.version}.jar"))
             artifact(sourcesJar)
         }
