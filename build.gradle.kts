@@ -10,10 +10,25 @@ plugins {
 }
 
 group = "com.sztorm"
-version = "2.0.0"
+version = "2.0.1"
 
 repositories {
     mavenCentral()
+}
+
+val sourcesJar by tasks.named("sourcesJar")
+
+publishing {
+    publications {
+        create("main", MavenPublication::class.java) {
+            artifactId = project.name
+            version = project.version as String
+            groupId = project.group as String
+            from(components["kotlin"])
+            artifact(file("./build/libs/${project.name}-${project.version}.jar"))
+            artifact(sourcesJar)
+        }
+    }
 }
 
 kotlin {
