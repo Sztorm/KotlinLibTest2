@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.sztorm"
-version = "2.0.1"
+version = "2.0.5"
 
 repositories {
     mavenCentral()
